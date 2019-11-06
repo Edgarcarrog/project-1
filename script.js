@@ -27,8 +27,8 @@ let sprite = 0;
 let row;
 
 class Catapult{
-  constructor(){
-    this.x = 100;
+  constructor(source){
+    this.x = 0;
     this.y = canvas.height/2;
     this.vel = 0;
     this.width = 100;
@@ -36,7 +36,7 @@ class Catapult{
     this.reset = 0;
     this.shooting = false;
     this.img = new Image();
-    this.img.src = './images/catapult.png';
+    this.img.src = source;
     this.img.onload = () => {
       this.draw();
     };
@@ -67,10 +67,61 @@ class Catapult{
         // termina el movimiento de la catapulta, shooting = false para parar su movimiento
         //shootBullet = true para dibujar a la bala
         this.shooting = false;
-        myBullet.xrel = this.x;
-        myBullet.yrel = this.y;
-        myBullet.shootBullet = true;
-        myBullet.reset = frames;
+        bullet1.xrel = this.x;
+        bullet1.yrel = this.y;
+        bullet1.shootBullet = true;
+        bullet1.reset = frames;
+      };
+    }
+  }
+  }
+}
+
+class Catapult2{
+  constructor(source){
+    this.width = 100;
+    this.x = 500;
+    this.y = canvas.height/2;
+    this.vel = 0;
+    this.height = 80;
+    this.reset = 0;
+    this.shooting = false;
+    this.img = new Image();
+    this.img.src = source;
+    this.img.onload = () => {
+      this.draw();
+    };
+  }
+
+  draw(){
+    if(this.shooting !== true){
+      ctx.drawImage(this.img, 0 , 120, 130, 110, canvas.width-this.width, canvas.height - this.height, this.width, this.height);
+    }
+  }
+
+  shoot(){
+    if(this.shooting){
+    if(row === 1){
+      ctx.drawImage(this.img, 0 + 130 * sprite, 120, 130, 110, canvas.width-this.width, canvas.height - this.height, this.width, this.height);
+      ctx.drawImage(this.img, 270 + 10 * sprite, 300, 20, 20, canvas.width-this.width, canvas.height - this.height, this.width, this.height);
+      if(frames%20 === 0){sprite++};
+      if(sprite === 5){
+        sprite = 0;
+        row = 0;
+      };
+    }else{
+      ctx.drawImage(this.img, 0 + 130 * sprite, 0, 130, 110, canvas.width-this.width, canvas.height - this.height, this.width, this.height);
+      if(frames%10 === 0){sprite++};
+      if(sprite === 5){
+        sprite = 0;
+        row = 1;
+        // termina el movimiento de la catapulta, shooting = false para parar su movimiento
+        //shootBullet = true para dibujar a la bala
+        this.shooting = false;
+        bullet2.xrel = this.x;
+        bullet2.yrel = this.y;
+        bullet2.shootBullet = true;
+        bullet2.reset = frames;
       };
     }
   }
@@ -78,13 +129,14 @@ class Catapult{
 }
 
 class Bullet{
-  constructor(){
+  constructor(direction){
     this.x = 100;
     this.y = 600;
     this.xrel = 100;
     this.yrel = 600;
     this.velx;
     this.vely;
+    this.direction = direction;
     this.arrayVel = [[600, 300], [447, 447], [300, 600]]
     this.grav = 400;
     this.width = 20;
@@ -103,7 +155,7 @@ class Bullet{
       this.velx = this.arrayVel[bulletDirection.direction][0];
       this.vely = this.arrayVel[bulletDirection.direction][1];
     this.y= this.yrel + 100 - (this.vely * (frames-this.reset)/60) + 0.5 * this.grav * Math.pow((frames-this.reset)/60, 2);
-    this.x = this.xrel + 85 + (this.velx * (frames-this.reset)/60);
+    this.x = this.xrel + 85 + (this.velx * this.direction * (frames-this.reset)/60);
     ctx.drawImage(this.img, 0, 0, 20, 20, this.x, this.y, this.width, this.height);
     if(this.y == canvas.height){this.shootBullet = false}
     }
@@ -159,7 +211,7 @@ class Castle{
     this.height = hei;
     this.sW = sW;
     this.sH = sH;
-    this.health = 3;
+    this.health = 15;
     //this.reset = 0;
     //this.shootBullet=false;
     this.img = new Image();
@@ -173,21 +225,32 @@ class Castle{
     //this.height = this.arrayDirection[direction][1];
     ctx.drawImage(this.img, 0 , 0, this.sW, this.sH, this.x, this.y, this.width, this.height);
   }
-  collision(){
-    if((myBullet.x+myBullet.width>this.x) && (myBullet.x<this.x+this.width) && (myBullet.y+myBullet.height>this.y)){
+  collision(bullet, index){
+    if((bullet.x+bullet.width>this.x) && (bullet.x<this.x+this.width) 
+    && (bullet.y+bullet.height>this.y) && (bullet.y<canvas.height)){
       this.health--;
+      console.log(this.health)
+      if(this.health === 0){
+        arrayCastle2.splice(index, 1)
+      }
     }
   }
 }
 
 
-const catap = new Catapult();
-const myBullet = new Bullet();
+const catap = new Catapult('./images/catapult.png');
+const catap2 = new Catapult2('./images/catapultbis.png');
+const bullet1 = new Bullet(1);
+const bullet2 = new Bullet(-1);
 const myBoard = new Board();
 //const myCastle = new Castle();
-let arrayCastle2 = [new Castle(979, 425, 71, 115, 143, 230, './images/castle3.png'),
-                    new Castle(898, 406, 81, 134, 163, 268, './images/castle2.png'),
-                    new Castle(824, 442, 74, 98, 148, 197, './images/castle1.png')]
+const arrayCastle2 = [new Castle(1029, 425, 71, 115, 143, 230, './images/castle3.png'),
+                    new Castle(948, 406, 81, 134, 163, 268, './images/castle2.png'),
+                    new Castle(874, 442, 74, 98, 148, 197, './images/castle1.png')]
+
+const arrayCastle1 = [new Castle(100, 425, 71, 115, 143, 230, './images/castle4.png'),
+                    new Castle(171, 406, 81, 134, 163, 268, './images/castle5.png'),
+                    new Castle(252, 442, 74, 98, 148, 197, './images/castle6.png')]
 const bulletDirection = new Direction();
 
 function update(){
@@ -196,16 +259,22 @@ function update(){
   myBoard.draw();
   catap.draw();
   catap.shoot();
-  myBullet.draw();
+  catap2.draw();
+  catap2.shoot();
+  bullet1.draw();
+  bullet2.draw();
   //myCastle.draw();
   arrayCastle2.forEach((element) => {
     element.draw();
   });
+  arrayCastle1.forEach((element) => {
+    element.draw();
+  });
   arrayCastle2.forEach((element, index) => {
-    element.collision();
-    if(element.health = 0){
-      arrayCastle2.splice(index, 1);
-    }
+    element.collision(bullet1, index);
+  });
+  arrayCastle1.forEach((element, index) => {
+    element.collision(bullet2, index);
   });
   bulletDirection.draw();
 }
@@ -214,14 +283,11 @@ document.onkeydown = (e) => {
   switch (e.keyCode) {
     case 38:
       catap.shooting = true;
-
     break;
-    case 37:
-      catap.x -= 5;
+    case 40:
+      catap2.shooting = true;
     break;
-    case 39:
-      catap.x += 5;
-    break;
+    
     case 107:
       if(bulletDirection.direction === 2){
         bulletDirection.direction = 0;

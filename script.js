@@ -1,3 +1,5 @@
+let music = document.getElementById("music")
+
 window.onload = function(){
   document.getElementById("start-button").onclick = function(){
     startGame();
@@ -6,6 +8,7 @@ window.onload = function(){
   function startGame(){
     if (interval) return;
     interval = setInterval(update, 1000/60)
+    music.play();
     points = 0;
     pointCounter = 0;
     frames = 0;
@@ -38,16 +41,15 @@ class Catapult{
   }
 
   draw(){
-    if(this.shooting !== true){
+    if(this.shooting !== true || bullet1.shootBullet == true){
       ctx.drawImage(this.img, 0 , 120, 130, 110, this.x, this.y, this.width, this.height);
     }
   }
 
   shoot(){
-    if(this.shooting){
+    if(this.shooting && bullet1.shootBullet == false){
     if(this.row === 1){
       ctx.drawImage(this.img, 0 + 130 * this.sprite, 120, 130, 110, this.x, this.y, this.width, this.height);
-      //ctx.drawImage(this.img, 270 + 10 * this.y, 300, 20, 20, this.x, canvas.height - this.height, this.width, this.height);
       if(frames%10 === 0){this.sprite++};
       if(this.sprite === 5){
         this.sprite = 0;
@@ -91,13 +93,13 @@ class Catapult2{
   }
 
   draw(){
-    if(this.shooting !== true){
+    if(this.shooting !== true || bullet2.shootBullet == true){
       ctx.drawImage(this.img, 0, 120, 130, 110, this.x, this.y, this.width, this.height);
     }
   }
 
   shoot(){
-    if(this.shooting){
+    if(this.shooting && bullet2.shootBullet == false){
     if(this.row === 1){
       ctx.drawImage(this.img, 0 + 130 * this.sprite, 120, 130, 110, this.x, this.y, this.width, this.height);
       ctx.drawImage(this.img, 270 + 10 * this.sprite, 300, 20, 20, this.x, this.y, this.width, this.height);
@@ -151,9 +153,6 @@ class Bullet{
 
   draw(){
     if(this.shootBullet){
-      //if(this.isShooting == true){
-      //  this.deg = direction1;
-      //}
       this.isShooting = false;
       this.velx = this.vel*Math.cos(this.deg*Math.PI / 180)
       this.vely = this.vel*Math.sin(this.deg*Math.PI / 180)
@@ -203,7 +202,7 @@ class Board{
     this.width = canvas.width;
     this.height = canvas.height;
     this.img = new Image();
-    this.img.src = './images/back.jpg';
+    this.img.src = './images/fondo.jpeg';
     this.img.onload = () => {
       this.draw();
     };

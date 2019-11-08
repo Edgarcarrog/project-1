@@ -256,15 +256,15 @@ function isTouching(array, bullet){
 function gameOver(){
   if(arrayCastle1.length === 0){
     ctx.font = '40px Courier';
-    ctx.fillText('Game Over', 510, 200);
-    ctx.fillText('Player 2 won', 500, 250);
+    ctx.fillText('Game Over', 510, 150);
+    ctx.fillText('Player 2 won', 500, 200);
     music.pause();
     clearInterval(interval);
   }
   if(arrayCastle2.length === 0){
     ctx.font = '40px Courier';
-    ctx.fillText('Game Over', 510, 200);
-    ctx.fillText('Player 1 won', 500, 250);
+    ctx.fillText('Game Over', 510, 150);
+    ctx.fillText('Player 1 won', 500, 200);
     music.pause();
     clearInterval(interval);
     /*********************************************/

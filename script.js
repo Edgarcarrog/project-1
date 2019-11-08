@@ -221,7 +221,7 @@ class Castle{
     this.height = hei;
     this.sW = sW;
     this.sH = sH;
-    this.health = 5;
+    this.health = 3;
     this.img = new Image();
     this.img.src = source;
     this.img.onload = () => {
@@ -270,6 +270,9 @@ let direction2 = 30;
 function update(){
   if(arrayCastle1.length == 0 || arrayCastle2.length == 0){
     clearInterval(interval);
+    /*********************************************/
+
+
   }
   frames++;
   ctx.clearRect(0, 0, canvas.width, canvas.height);

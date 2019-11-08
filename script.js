@@ -192,6 +192,8 @@ class Direction{
     ctx.closePath();
     ctx.font = '40px Courier';
     ctx.fillText(this.value, this.x, this.y-200);
+    ctx.fillText('Player 1', 50, 80);
+    ctx.fillText('Player 2', 970, 80);
   } 
 }
 
@@ -251,6 +253,24 @@ function isTouching(array, bullet){
   });
 }
 
+function gameOver(){
+  if(arrayCastle1.length === 0){
+    ctx.font = '40px Courier';
+    ctx.fillText('Game Over', 510, 200);
+    ctx.fillText('Player 2 won', 500, 250);
+    music.pause();
+    clearInterval(interval);
+  }
+  if(arrayCastle2.length === 0){
+    ctx.font = '40px Courier';
+    ctx.fillText('Game Over', 510, 200);
+    ctx.fillText('Player 1 won', 500, 250);
+    music.pause();
+    clearInterval(interval);
+    /*********************************************/
+  }
+}
+
 const catap1 = new Catapult('./images/catapult.png');
 const catap2 = new Catapult2('./images/catapultbis.png');
 const bullet1 = new Bullet(1);
@@ -268,12 +288,6 @@ let direction1 = 30;
 let direction2 = 30;
 
 function update(){
-  if(arrayCastle1.length == 0 || arrayCastle2.length == 0){
-    clearInterval(interval);
-    /*********************************************/
-
-
-  }
   frames++;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   myBoard.draw();
@@ -293,6 +307,7 @@ function update(){
   isTouching(arrayCastle2, bullet1)
   bulletDirection1.draw();
   bulletDirection2.draw();
+  gameOver();
 }
 
 document.onkeydown = (e) => {

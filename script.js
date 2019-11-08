@@ -1,9 +1,9 @@
 window.onload = function(){
-  document.getElementById("start-button").onclick = function() {
+  document.getElementById("start-button").onclick = function(){
     startGame();
   };
 
-  function startGame() {
+  function startGame(){
     if (interval) return;
     interval = setInterval(update, 1000/60)
     points = 0;
@@ -18,7 +18,6 @@ let interval;
 let frames = 0;
 let points = 0;
 let pointCounter = 0;
-//let pointFlag = true;
 
 class Catapult{
   constructor(source){
@@ -134,14 +133,15 @@ class Bullet{
     this.yrel;
     this.velx = 0;
     this.vely = 0;
-    this.vel = 700;
-    this.deg = 10;
+    this.vel = 500;
+    this.deg = 30;
     this.direction = direction;
     this.grav = 300;
     this.width = 25;
     this.height = 25;
     this.reset = 0;
-    this.shootBullet=false;
+    this.shootBullet = false;
+    this.isShooting = true;
     this.img = new Image();
     this.img.src = './images/bullet.png';
     this.img.onload = () => {
@@ -151,12 +151,19 @@ class Bullet{
 
   draw(){
     if(this.shootBullet){
+      //if(this.isShooting == true){
+      //  this.deg = direction1;
+      //}
+      this.isShooting = false;
       this.velx = this.vel*Math.cos(this.deg*Math.PI / 180)
       this.vely = this.vel*Math.sin(this.deg*Math.PI / 180)
       this.y = this.yrel - (this.vely * (frames-this.reset)/60) + 0.5 * this.grav * Math.pow((frames-this.reset)/60, 2);
       this.x = this.xrel + (this.velx * this.direction * (frames-this.reset)/60);
       ctx.drawImage(this.img, 0, 0, 20, 20, this.x, this.y, this.width, this.height);
-      if(this.y == canvas.height){this.shootBullet = false}
+      if(this.y > canvas.height){
+        this.shootBullet = false;
+        this.isShooting = true;
+      }
     }
   }
 }
@@ -167,20 +174,25 @@ class Direction{
     this.y = y;
     this.direction = direction;
     this.long = 200;
-    this.deg = 10
+    this.deg = 30
     this.width = 200
     this.height = 0
+    this.value = 0;
 }
   draw(){
-    this.width = this.long*Math.cos(this.deg*Math.PI / 180)
-    this.height = -this.long*Math.sin(this.deg*Math.PI / 180)
+    this.value++;
+    if(this.value === 102){this.value=0}
+    this.width = this.long*Math.cos(this.deg*Math.PI/180)
+    this.height = -this.long*Math.sin(this.deg*Math.PI/180)
     ctx.lineWidth = '3';
-    ctx.fillStyle = 'blue';
+    ctx.lineStyle = 'blue';
     ctx.beginPath();
     ctx.moveTo(this.x, this.y);
     ctx.lineTo(this.x + this.direction * this.width, this.y + this.height);
     ctx.stroke();
     ctx.closePath();
+    ctx.font = '40px Courier';
+    ctx.fillText(this.value, this.x, this.y-200);
   } 
 }
 
@@ -191,7 +203,7 @@ class Board{
     this.width = canvas.width;
     this.height = canvas.height;
     this.img = new Image();
-    this.img.src = './images/backg.png';
+    this.img.src = './images/back.jpg';
     this.img.onload = () => {
       this.draw();
     };
@@ -211,8 +223,6 @@ class Castle{
     this.sW = sW;
     this.sH = sH;
     this.health = 5;
-    //this.reset = 0;
-    //this.shootBullet=false;
     this.img = new Image();
     this.img.src = source;
     this.img.onload = () => {
@@ -223,33 +233,22 @@ class Castle{
     ctx.drawImage(this.img, 0 , 0, this.sW, this.sH, this.x, this.y, this.width, this.height);
   }
   collision(bullet, index){
-
     return (bullet.x+bullet.width>this.x) && (bullet.x<this.x+this.width) 
     && (bullet.y+bullet.height>this.y) && (bullet.y<this.y+this.height);
-    /*if((bullet.x+bullet.width>this.x) && (bullet.x<this.x+this.width) 
-    && (bullet.y+bullet.height>this.y) && (bullet.y<this.y+this.height)){
-      bullet.x = canvas.width;
-      bullet.y = canvas.height;
-      this.health--;
-      console.log(this.health)
-      if(this.health === 0){
-        arrayCastle2.splice(index, 1)
-      }
-    }*/
   }
 }
 
 function isTouching(array, bullet){
   array.forEach((element, index) => {
-  //console.log(`${element}, ${element.health}`)
-  if(element.collision(bullet, index)){
-    bullet.shootBullet=false;
-    bullet.y = canvas.height;
-    element.health--;
-    if(element.health === 0){
-      array.splice(index, 1)
+    if(element.collision(bullet, index)){
+      bullet.shootBullet=false;
+      bullet.isShooting = true;
+      bullet.y = canvas.height;
+      element.health--;
+      if(element.health === 0){
+        array.splice(index, 1)
+      }
     }
-  };
   });
 }
 
@@ -266,7 +265,8 @@ const arrayCastle2 = [new Castle(1029, 425, 71, 115, 143, 230, './images/castle3
 const arrayCastle1 = [new Castle(100, 425, 71, 115, 143, 230, './images/castle4.png'),
                     new Castle(171, 406, 81, 134, 163, 268, './images/castle5.png'),
                     new Castle(252, 442, 74, 98, 148, 197, './images/castle6.png')]
-
+let direction1 = 30;
+let direction2 = 30;
 
 function update(){
   if(arrayCastle1.length == 0 || arrayCastle2.length == 0){
@@ -287,16 +287,8 @@ function update(){
   arrayCastle1.forEach((element) => {
     element.draw();
   });
-
   isTouching(arrayCastle1, bullet2)
   isTouching(arrayCastle2, bullet1)
-  //arrayCastle1.forEach((element, index) => {
-  //  element.collision(bullet1, index);
-  //});
-  //arrayCastle1.forEach((element, index) => {
-  //  element.collision(bullet2, index);
-  //  console.log(arrayCastle2[index].health)
-  //});
   bulletDirection1.draw();
   bulletDirection2.draw();
 }
@@ -305,46 +297,44 @@ document.onkeydown = (e) => {
   switch (e.keyCode) {
     case 83:
       catap1.shooting = true;
+      if(bullet1.isShooting == true){
+        bullet1.vel = 400 + bulletDirection1.value*4;
+        bullet1.deg = bulletDirection1.deg;
+      }
     break;
     case 40:
       catap2.shooting = true;
-    break;
-    case 68:
-      if(bulletDirection1.deg == 70){
-        bulletDirection1.deg = 10;
-        bullet1.deg = bulletDirection1.deg;
-      }else{
-        bulletDirection1.deg+=10;
-        bullet1.deg = bulletDirection1.deg;
+      if(bullet2.isShooting == true){
+        bullet2.vel = 400 + bulletDirection2.value*4;
+        bullet2.deg = bulletDirection2.deg;
       }
     break;
     case 65:
-      if(bulletDirection1.deg == 10){
-        bulletDirection1.deg = 70;
-        bullet1.deg = bulletDirection1.deg;
+      if(bulletDirection1.deg == 70){
+        bulletDirection1.deg = 30;
       }else{
-        bulletDirection1.deg-=10;
-        bullet1.deg = bulletDirection1.deg;
+        bulletDirection1.deg+=10;
       }
     break;
-
-
+    case 68:
+      if(bulletDirection1.deg == 30){
+        bulletDirection1.deg = 70;
+      }else{
+        bulletDirection1.deg-=10;
+      }
+    break;
     case 39:
       if(bulletDirection2.deg == 70){
-        bulletDirection2.deg = 10;
-        bullet2.deg = bulletDirection2.deg;
+        bulletDirection2.deg = 30;
       }else{
         bulletDirection2.deg+=10;
-        bullet2.deg = bulletDirection2.deg;
       }
     break;
     case 37:
-      if(bulletDirection2.deg == 10){
+      if(bulletDirection2.deg == 30){
         bulletDirection2.deg = 70;
-        bullet2.deg = bulletDirection2.deg;
       }else{
         bulletDirection2.deg-=10;
-        bullet2.deg = bulletDirection2.deg;
       }
     break;
   }
